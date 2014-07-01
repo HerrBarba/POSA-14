@@ -70,7 +70,7 @@ public class DownloadActivity extends DownloadBase {
             // Get an actual reference to the DownloadActivity
             // from the WeakReference.
             final DownloadActivity activity = outerClass.get();
-    		
+    		final Message m = msg;
             // If DownloadActivity hasn't been garbage collected
             // (closed by user), display the sent image.
             if (activity != null) {
@@ -78,6 +78,13 @@ public class DownloadActivity extends DownloadBase {
                 // bitmap that's been downloaded and returned to
                 // the DownloadActivity as a pathname who's Bundle
             	// key is defined by DownloadUtils.PATHNAME_KEY
+            	activity.runOnUiThread(new Runnable() {
+					
+					@Override
+					public void run() {
+						activity.displayBitmap(m.getData().getString(DownloadUtils.PATHNAME_KEY));
+					}
+				});
             }
     	}
     }
@@ -107,7 +114,9 @@ public class DownloadActivity extends DownloadBase {
             // TODO - You fill in here to start the
             // DownloadIntentService with the appropriate Intent
             // returned from the makeIntent() factory method.
-
+        	startService(
+        			DownloadIntentService.makeIntent(
+        					this, handler, getUrlString()));
             which = "Starting IntentService";
             break;
         
@@ -115,7 +124,9 @@ public class DownloadActivity extends DownloadBase {
             // TODO - You fill in here to start the
             // ThreadPoolDownloadService with the appropriate Intent
             // returned from the makeIntent() factory method.
-
+        	startService(
+        			ThreadPoolDownloadService.makeIntent(
+        					this, handler, getUrlString()));
             which = "Starting ThreadPoolDownloadService";
             break;
         
